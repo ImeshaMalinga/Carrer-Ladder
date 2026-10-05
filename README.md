@@ -132,13 +132,14 @@ No production code has been written yet.
 ```bash
 # Clone the repository
 git clone <repo-url>
-cd lifeecho
 
 # Install dependencies
 pip install -r requirements.txt
 
 # Set environment variables
-cp .env.example .env
+python -m venv venv
+venv\Scripts\activate
+deactivate
 
 # Run the application
 uvicorn app.main:app --reload
