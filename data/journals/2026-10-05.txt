@@ -1,0 +1,8 @@
+Date: 2026-10-05
+Mood: Mixed – excited about the new project, drained by internship
+
+Today I officially started the LLM + .NET personal project. Spent the evening setting up the solution structure and thinking about the first feature (simple RAG over personal notes).
+
+At the internship I completed the assigned tickets but felt invisible again. No feedback on the work I submitted last week. It’s hard to stay motivated when effort goes unnoticed.
+
+Job search: Still haven’t sent any applications this week. Need to fix that soon.
