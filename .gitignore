@@ -216,3 +216,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Chroma vector database
+chroma_db/
+*.bin
+
