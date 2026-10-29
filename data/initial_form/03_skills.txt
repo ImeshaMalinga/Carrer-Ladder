@@ -1,0 +1,16 @@
+Strong skills:
+- C# and .NET (ASP.NET Core, Entity Framework)
+- Python
+- REST API design
+- SQL and relational databases
+- Git and basic CI/CD concepts
+
+Growing skills:
+- Large Language Models (prompt engineering, basic integration)
+- Vector databases and simple RAG concepts
+- Frontend basics (enough to build simple UIs)
+
+Tools currently using or learning:
+- Visual Studio / VS Code
+- Docker (basic)
+- Postman

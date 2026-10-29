@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 import glob
+from data_vect import build_vector_store, embed_texts, load_documents, search
 
 load_dotenv()
 api_key = os.getenv("Gemini_API_Key")
@@ -24,19 +25,26 @@ client = genai.Client(
 
 content = '''I am a software engineering ug , out in one month ,
             finding a carrer(job), today i have started new project based on LLM and .NET,
-            but i could focusly do my internship work thorough out my day time because enough appretiation
+            but i couldn't focusly do my internship work thorough out my day time because np enough appretiation
             for my work at my internship work place.
             '''
+
+results = search(
+    content,
+    top_k=3
+)
+
 # Initialize a chat session with your configuration / tools
 chat = client.chats.create(
     model="gemini-3.6-flash",
     config=types.GenerateContentConfig(
         system_instruction="You are a carrer builder, give a paln for tommorow and for next month",
-        # tools=[your_tool_function]  <-- If using tools
     )
 )
 
 
-response = chat.send_message(content)
+response = chat.send_message(
+    "\n\n".join(result["text"] for result in results)
+)
     
 print(response.text)

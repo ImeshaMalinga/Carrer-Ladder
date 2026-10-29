@@ -1,0 +1,8 @@
+Date: 2026-10-07
+Mood: Low energy in the morning, better at night
+
+Struggled to focus during internship hours. The lack of appreciation is starting to affect how much care I put into the work. I still do the tasks, but without pride.
+
+After work I wrote the first version of a simple document loader for the RAG project. Decided the project will be a personal career assistant that uses my own journals and form data.
+
+Also updated my resume draft. Need to start applying this weekend.
