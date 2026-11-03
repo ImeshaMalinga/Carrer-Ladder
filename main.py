@@ -23,10 +23,10 @@ client = genai.Client(
     )
 )
 
-content = '''I am a software engineering ug , out in one month ,
-            finding a carrer(job), today i have started new project based on LLM and .NET,
-            but i couldn't focusly do my internship work thorough out my day time because np enough appretiation
-            for my work at my internship work place.
+content = '''My internship is over and company have not decided to hire me or not, so until they decide they told me to apply for
+            other companies as well, they will give their decision after 2-3 weeks, and i am doing assignments, projects as my part
+            time income source and i have got to do a research on cyber security side due on december 01 , i have not done anything on 
+            that yet.i feel stressed and i couldn't do any work because of that
             '''
 
 results = search(
@@ -42,8 +42,8 @@ chat = client.chats.create(
     )
 )
 
-
-response = chat.send_message(
+#print(content+ "\n\n".join(result["text"] for result in results))
+response = chat.send_message(content+
     "\n\n".join(result["text"] for result in results)
 )
     
