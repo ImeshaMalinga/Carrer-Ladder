@@ -1,0 +1,10 @@
+Date: 2026-10-25
+Mood: Mixed
+
+Started the LLM + .NET project tonight. Just the solution structure and a rough idea for a personal assistant that reads my own notes. Felt a spark I haven’t felt at the internship in weeks.
+
+Internship was the usual. Finished tickets, no comments, no thanks. Came home tired.
+
+Mom called. She asked if I’m eating properly and whether I’ve applied to “safe” companies. I didn’t have the energy to explain the project. Told her I’m fine.
+
+Missed my ex a bit while coding. Weird how building something new still makes you want to tell the person who’s no longer there.

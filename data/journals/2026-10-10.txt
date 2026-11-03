@@ -1,8 +1,0 @@
-Date: 2026-10-10
-Mood: Tired but satisfied
-
-Longer internship day. Had a meeting where my suggestions were mostly ignored. Felt the usual drop in motivation afterward.
-
-Evening: improved the journal ingestion pipeline and added a couple more documents. Also practiced two easy LeetCode problems to stay sharp for interviews.
-
-Noticed that even 60–90 minutes of focused project work restores a lot of energy compared to a full day of feeling undervalued.

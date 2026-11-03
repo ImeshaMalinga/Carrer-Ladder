@@ -1,0 +1,11 @@
+Date: 2026-10-28
+Mood: Determined
+
+Made a decision. Next 30 days = focused sprint.
+- Internship: show up, do clean work, don’t expect validation.
+- Job search: minimum number of applications per week.
+- Project: ship a usable personal RAG assistant.
+
+Spent the evening writing down what the assistant should know about me. Felt strangely hopeful. Having a plan reduces the noise in my head.
+
+Also cleaned my desk. Small external order helps internal order.

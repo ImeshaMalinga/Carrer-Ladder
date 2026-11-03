@@ -37,6 +37,7 @@ def load_documents(data_dir="data"):
     return documents
 
 
+
 # ----------------------------
 # 2. Embed texts
 # ----------------------------
@@ -111,6 +112,11 @@ def search(query: str, top_k=4, model="gemini-embedding-001"):
 # Run
 # ----------------------------
 if __name__ == "__main__":
+
+    data=load_documents("data")
+
+    print(data[0], "\n",data[1], "\n", data[10], "\n")
+    '''
     # Run this only when you add/change files
     build_vector_store("data")
 
@@ -124,3 +130,5 @@ if __name__ == "__main__":
     for r in results:
         print(f"\nID: {r['id']} | distance: {r['distance']:.4f}")
         print(r["text"][:300] + "...")
+
+    '''
