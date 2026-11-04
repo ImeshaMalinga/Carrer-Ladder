@@ -1,4 +1,0 @@
-Degree: Bachelor of Science in Software Engineering
-Expected Graduation: November 2026
-Key coursework: Data Structures, Algorithms, Database Systems, Software Design, Web Development, Introduction to Machine Learning
-Capstone / final year project: Not yet finalized, but interested in combining traditional software engineering with modern AI features

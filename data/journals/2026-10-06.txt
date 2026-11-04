@@ -1,8 +1,0 @@
-Date: 2026-10-06
-Mood: Frustrated + slightly hopeful
-
-Internship day felt long. Kept checking the clock. Managed to finish the required tasks but my mind kept drifting to the side project.
-
-In the evening I implemented a basic chat endpoint in .NET that calls the Gemini API. It felt good to see something working. This is the kind of progress that gives me energy.
-
-Realized I need a clearer daily structure so the internship doesn’t completely kill my momentum.

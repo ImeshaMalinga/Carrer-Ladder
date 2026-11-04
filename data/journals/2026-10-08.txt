@@ -1,9 +1,0 @@
-Date: 2026-10-08
-Mood: Determined
-
-Made a decision today: I will treat the next 30 days as a focused sprint.
-- Internship: do the work cleanly but protect my energy (time-box it)
-- Job search: aim for a set number of applications per week
-- Side project: ship a usable MVP of the LLM + .NET career assistant
-
-Spent 90 minutes refining the system prompt and thinking about what context the RAG should retrieve. Feeling clearer than earlier this week.

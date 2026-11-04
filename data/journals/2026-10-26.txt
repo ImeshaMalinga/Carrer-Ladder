@@ -1,0 +1,8 @@
+Date: 2026-10-26
+Mood: Frustrated → slightly better at night
+
+Hard day at the internship. Meeting where my suggestion was basically ignored. Smiled and nodded. Felt small.
+
+Evening: got a basic Gemini call working from the .NET API. Watching the response come back felt disproportionately good. This project is becoming my emotional battery.
+
+Texted Sam. He’s already got two interviews lined up. Happy for him, also a quiet sting of comparison. Told myself comparison is useless and kept coding for another hour.

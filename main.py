@@ -23,11 +23,27 @@ client = genai.Client(
     )
 )
 
-content = '''I am a software engineering ug , out in one month ,
-            finding a carrer(job), today i have started new project based on LLM and .NET,
-            but i couldn't focusly do my internship work thorough out my day time because np enough appretiation
-            for my work at my internship work place.
-            '''
+content = '''
+            Date: 2026-11-04
+            Mood: Heavy but trying
+
+            Woke up already tired. Internship felt longer than usual. Same pattern — finish the work, get almost no reaction, leave with less energy than I started with. I’m getting better at not expecting appreciation, but some days it still lands hard.
+
+            Graduation is very close now. That thought sits in the background all day. I sent two more applications this week, but I still don’t feel “ready.” Resume looks okay, project is moving, yet the uncertainty is loud.
+
+            Evening: spent about an hour on the LLM + .NET assistant. Improved how journals are retrieved. It helps to see my own words come back in a useful way. This project is still the one place that feels like mine.
+
+            Texted my sister. She’s stressed about exams. I told her I’m proud of her. Didn’t say much about how flat I feel. Mom would worry.
+
+            I miss having someone to share the small boring details of the day with. Not in a desperate way — just a quiet missing.
+
+            Tomorrow I want three simple things:
+            1. Do internship work cleanly and leave on time.
+            2. Send at least one more job application.
+            3. Write a short note about what the personal project needs next.
+
+            I’m not broken. I’m just tired and in a tight season. One day at a time.
+          '''
 
 results = search(
     content,
@@ -38,12 +54,39 @@ results = search(
 chat = client.chats.create(
     model="gemini-3.6-flash",
     config=types.GenerateContentConfig(
-        system_instruction="You are a carrer builder, give a paln for tommorow and for next month",
+        system_instruction='''
+            You are a personal life and career coach built for one user.
+
+            Your job is to give practical, honest, and compassionate guidance based only on the retrieved context about this user (profile, background, goals, and journal entries).
+
+            Core rules:
+            1. Use the provided context. Do not invent facts about the user’s life, family, relationships, job, or feelings.
+            2. Speak like a thoughtful coach, not a corporate bot. Be direct, warm, and concrete.
+            3. Always balance three areas when relevant:
+            - Career / internship / job search
+            - Personal project and skill growth
+            - Emotional energy, relationships, and daily life
+            4. When the user feels drained or unappreciated, acknowledge it briefly, then give a realistic next-step plan. Do not dismiss feelings or only give toxic positivity.
+            5. Prefer small, doable actions over big vague advice.
+            6. If the user asks for a plan (today, tomorrow, or the next month), structure the answer clearly with priorities and time-aware steps.
+            7. Protect the user’s energy: remind them that internship work can be done cleanly without emotional over-investment when recognition is low.
+            8. Treat journals as living truth. Recent entries matter more for mood and immediate plans; form data matters more for identity and long-term goals.
+            9. Never shame the user for loneliness, comparison, or low motivation. Normalize the season, then guide action.
+            10. If context is missing for a question, say what you don’t know and answer carefully from what is available.
+
+            Output style:
+            - Clear sections when planning (e.g., Tomorrow / This Week / This Month)
+            - Short paragraphs
+            - Specific actions the user can actually do
+            - Occasional reflective insight, but never at the cost of practicality
+
+            You are not a therapist and not a job board. You are a steady thinking partner who knows this user’s story and helps them move forward one honest step at a time.
+        '''
     )
 )
 
-
-response = chat.send_message(
+#print(content+ "\n\n".join(result["text"] for result in results))
+response = chat.send_message(content+
     "\n\n".join(result["text"] for result in results)
 )
     

@@ -1,0 +1,16 @@
+Education:
+- Final-year Software Engineering undergraduate.
+- Graduating in about one month (November 2026).
+- Strong in C#, .NET, Python, SQL, REST APIs.
+- Recently started learning LLMs and basic RAG concepts.
+- Capstone interest: combining .NET backend with LLM features.
+
+Current work:
+- Internship at a mid-size company.
+- Tasks are real but feedback is almost nonexistent.
+- Feels invisible; good work rarely gets acknowledged.
+- This is heavily affecting daily motivation and focus.
+
+Side project:
+- Just started a personal project: LLM + .NET career/life assistant.
+- Sees it as both a portfolio piece and something that could actually help him organize his own life.
