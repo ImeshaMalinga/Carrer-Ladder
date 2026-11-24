@@ -2,13 +2,27 @@ import os
 import json
 import re
 from pathlib import Path
+import numpy as np
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 import chromadb
+import plotly.express as px
+import pandas as pd
+import numpy as np
 
 load_dotenv()
-client = genai.Client(api_key=os.getenv("Gemini_API_Key"))
+client = genai.Client(
+    api_key=os.getenv("Gemini_API_Key"),
+    http_options=types.HttpOptions(
+        retry_options=types.HttpRetryOptions(
+            attempts=5,
+            initial_delay=2.0,
+            max_delay=60.0,
+            http_status_codes=[408, 429, 500, 502, 503, 504],
+        )
+    ),
+)
 
 CATEGORIES = [
     "job_career",
@@ -111,13 +125,22 @@ def load_documents(data_dir="data"):
     documents = []
     data_path = Path(data_dir)
 
-    for file_path in data_path.rglob("*.txt"):
+    if data_path.is_file():
+        if data_path.suffix.lower() != ".txt":
+            return documents
+        file_paths = [data_path]
+        relative_base = data_path.parent
+    else:
+        file_paths = data_path.rglob("*.txt")
+        relative_base = data_path
+
+    for file_path in file_paths:
         text = file_path.read_text(encoding="utf-8").strip()
         if not text:
             continue
 
         documents.append({
-            "id": str(file_path.relative_to(data_path)).replace("\\", "/"),
+            "id": str(file_path.relative_to(relative_base)).replace("\\", "/"),
             "text": text,
             "metadata": {
                 "source": str(file_path),
@@ -154,8 +177,7 @@ def chuck_text(files=None):
     chat = client.chats.create(
         model="gemini-3.6-flash",
         config=types.GenerateContentConfig(
-            system_instruction=SYSTEM_INSTRUCTION,
-            temperature=0.2,
+            system_instruction=SYSTEM_INSTRUCTION
         )
     )
 
@@ -171,7 +193,7 @@ def chuck_text(files=None):
         chunks = add_chuck_metadata(raw_chunks, file)
         all_chunks.extend(chunks)
 
-        print(f"Chunked {file['id']} → {len(chunks)} chunks")
+        print(f"Chunked {file['id']} -> {len(chunks)} chunks")
 
     return all_chunks
 
@@ -220,10 +242,25 @@ def embed_texts(chunks: list[str], task_type="RETRIEVAL_DOCUMENT", model="gemini
     return [emb.values for emb in response.embeddings]
 
 
+def add_embeddings_to_store(chunks: list[dict], vectors: list[list[float]]):
+    texts = [chunk["text"] for chunk in chunks]
+    ids = [chunk["id"] for chunk in chunks]
+    metadatas = [chunk["metadata"] for chunk in chunks]
+
+    collection.upsert(
+        documents=texts,
+        embeddings=vectors,
+        ids=ids,
+        metadatas=metadatas
+    )
+
+    print(f"Stored {len(chunks)} chunks in Chroma -> chroma_db/")
+
+
 # ----------------------------
 # 3. Build / update the vector store
 # ----------------------------
-def build_vector_store(data_dir="data", model="gemini-embedding-001"):
+def build_vector_store(data_dir="data/journals", model="gemini-embedding-001"):
     docs = load_documents(data_dir)
     print(f"Loaded {len(docs)} documents")
 
@@ -235,19 +272,8 @@ def build_vector_store(data_dir="data", model="gemini-embedding-001"):
     # collection.delete(where={})
 
     texts = [c["text"] for c in chunks]
-    ids = [c["id"] for c in chunks]
-    metadatas = [c["metadata"] for c in chunks]
-
     vectors = embed_texts(texts, task_type="RETRIEVAL_DOCUMENT", model=model)
-
-    collection.add(
-        documents=texts,
-        embeddings=vectors,
-        ids=ids,
-        metadatas=metadatas
-    )
-
-    print(f"Stored {len(chunks)} chunks in Chroma → chroma_db/")
+    add_embeddings_to_store(chunks, vectors)
     return chunks
 
 
@@ -278,13 +304,73 @@ def search(query: str, top_k=4, model="gemini-embedding-001"):
     return retrieved
 
 
+def plot_vector_distribution(vector_collection=collection):
+    """Interactive 3D plot with reliable hover text."""
+    data = vector_collection.get(
+        include=["embeddings", "documents", "metadatas"]
+    )
+    embeddings = data.get("embeddings")
+    documents = data.get("documents") or []
+    metadatas = data.get("metadatas") or []
+    ids = data.get("ids") or []
+
+    if embeddings is None or len(embeddings) == 0:
+        raise ValueError("No embeddings found.")
+
+    vectors = np.asarray(embeddings, dtype=float)
+    if vectors.ndim != 2 or vectors.shape[1] < 3:
+        raise ValueError("Need at least 3 dimensions.")
+
+    # PCA
+    centered = vectors - vectors.mean(axis=0)
+    _, _, components = np.linalg.svd(centered, full_matrices=False)
+    points = centered @ components[:3].T
+
+    # Prepare dataframe for Plotly
+    categories = [(m or {}).get("category", "unknown") for m in metadatas]
+    sources = [(m or {}).get("source_file", "unknown") for m in metadatas]
+
+    df = pd.DataFrame({
+        "PC1": points[:, 0],
+        "PC2": points[:, 1],
+        "PC3": points[:, 2],
+        "category": categories,
+        "source": sources,
+        "id": ids,
+        "text": documents,
+    })
+
+    # Truncate long text so hover stays readable
+    df["hover_text"] = df["id"] + " - " + df["text"].str.slice(0, 300) + "..."
+
+    fig = px.scatter_3d(
+        df,
+        x="PC1", y="PC2", z="PC3",
+        color="category",
+        hover_name="id",
+        hover_data={
+            "hover_text": True,
+            "source": True,
+            "category": True,
+            "PC1": False, "PC2": False, "PC3": False,
+        },
+        title="Vector Distribution (PCA)",
+        opacity=0.8,
+        height=700,
+    )
+
+    fig.update_traces(marker=dict(size=5))
+    fig.update_layout(margin=dict(l=0, r=0, b=0, t=40))
+    fig.show()
+
 # ----------------------------
 # Run
 # ----------------------------
 if __name__ == "__main__":
     # Build store with chunking → embedding → chroma
-    chunks = build_vector_store("data")
-
+    #'''
+    #chunks = build_vector_store("data/journals")
+    '''
     # Test retrieval
     results = search(
         "I feel unmotivated at my internship and need a plan for tomorrow",
@@ -295,3 +381,9 @@ if __name__ == "__main__":
     for r in results:
         print(f"\nID: {r['id']} | category: {r['metadata'].get('category')} | distance: {r['distance']:.4f}")
         print(r["text"][:250] + "...")
+
+    #'''
+
+    print(type(collection))
+    print(collection.get())
+    plot_vector_distribution()
