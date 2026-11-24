@@ -1,10 +1,15 @@
 import os
-from os import path
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
-import glob
-from data_vect import build_vector_store, embed_texts, load_documents, search
+from pathlib import Path
+from data_vect import (
+    add_embeddings_to_store,
+    chuck_text,
+    embed_texts,
+    load_documents,
+    search,
+)
 
 load_dotenv()
 api_key = os.getenv("Gemini_API_Key")
@@ -24,31 +29,55 @@ client = genai.Client(
 )
 
 content = '''
-            Date: 2026-11-04
-            Mood: Heavy but trying
+            Date: 2026-11-05  
+            Mood: Quiet and a little heavier than yesterday
 
-            Woke up already tired. Internship felt longer than usual. Same pattern — finish the work, get almost no reaction, leave with less energy than I started with. I’m getting better at not expecting appreciation, but some days it still lands hard.
+            Woke up later than I meant to. The tiredness didn’t fully leave overnight. Internship was slower today — fewer tasks, more waiting. I finished what was given and left on time, which felt like a small win even if no one noticed.
 
-            Graduation is very close now. That thought sits in the background all day. I sent two more applications this week, but I still don’t feel “ready.” Resume looks okay, project is moving, yet the uncertainty is loud.
+            Sent one more application in the afternoon. Still no replies from the earlier ones. The silence is starting to feel familiar. Graduation is only weeks away now, and the gap between “almost done” and “what comes next” feels wider than it should.
 
-            Evening: spent about an hour on the LLM + .NET assistant. Improved how journals are retrieved. It helps to see my own words come back in a useful way. This project is still the one place that feels like mine.
+            Worked on the LLM + .NET project for a bit longer than planned. Fixed a small retrieval issue and cleaned up how journal entries are ranked. Seeing my own words come back still feels grounding. It’s the one place where progress is visible and belongs only to me.
 
-            Texted my sister. She’s stressed about exams. I told her I’m proud of her. Didn’t say much about how flat I feel. Mom would worry.
+            Spoke with my sister briefly. She’s still buried in exams. I mostly listened. Didn’t mention how flat the day felt. Some things are easier to carry quietly.
 
-            I miss having someone to share the small boring details of the day with. Not in a desperate way — just a quiet missing.
+            The quiet missing is still there — not sharp, just present. A low background hum.
 
-            Tomorrow I want three simple things:
-            1. Do internship work cleanly and leave on time.
-            2. Send at least one more job application.
-            3. Write a short note about what the personal project needs next.
+            Tomorrow I want three simple things:  
+            1. Finish internship tasks without dragging them past the end of the day.  
+            2. Spend focused time on the personal project (even 45 minutes counts).  
+            3. Write down one concrete next step for the job search instead of just “apply more.”
 
-            I’m not broken. I’m just tired and in a tight season. One day at a time.
+            I’m still here. Still moving, even if the pace is slower than I want. One day at a time.
           '''
 
-results = search(
-    content,
-    top_k=3
+journal_path = Path("data/journals/2026-11-05.txt")
+journal_path.parent.mkdir(parents=True, exist_ok=True)
+journal_path.write_text(content.strip() + "\n", encoding="utf-8")
+print(f"Created journal: {journal_path}")
+
+documents = load_documents(str(journal_path))
+chunks = chuck_text(documents)
+
+chunk_texts = [chunk["text"] for chunk in chunks]
+chunk_embeddings = embed_texts(
+    chunk_texts,
+    task_type="RETRIEVAL_DOCUMENT",
 )
+
+retrieved_context = []
+print("Retrieved chunks (k=1 for each journal chunk):")
+for chunk in chunks:
+    results = search(chunk["text"], top_k=1)
+    print(f"\nQuery: {chunk['text']}")
+    if results:
+        match = results[0]
+        print(f"  Match: {match['text']}")
+        print(f"  Category: {match['metadata'].get('category')}")
+        print(f"  Distance: {match['distance']:.4f}")
+        retrieved_context.append(match["text"])
+
+
+add_embeddings_to_store(chunks, chunk_embeddings)
 
 # Initialize a chat session with your configuration / tools
 chat = client.chats.create(
@@ -85,9 +114,11 @@ chat = client.chats.create(
     )
 )
 
-#print(content+ "\n\n".join(result["text"] for result in results))
-response = chat.send_message(content+
-    "\n\n".join(result["text"] for result in results)
+#print(content + "\n\n".join(retrieved_context))
+response = chat.send_message(
+    content + "\n\n" + "\n\n".join(retrieved_context)
 )
-    
+
+print("Response from AI Coach:")
+
 print(response.text)
